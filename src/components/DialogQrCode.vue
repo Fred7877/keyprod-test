@@ -16,7 +16,15 @@
               hint="qrcode du produit"
               label="Saisir QrCode* :"
           ></v-text-field>
+        </v-card-text>
 
+        <v-card-text>
+          <v-text-field
+              width="500"
+              v-model="nbArticle"
+              hint="Nombre d'article préparé"
+              label="Saisir le nombre d'article préparés :"
+          ></v-text-field>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -87,35 +95,47 @@
 
 <script>
 import {mapState} from "vuex";
+import mixin from "../mixin";
 
 export default {
   name: 'dialog-qrcode',
+  mixins: [mixin],
   data() {
     return {
       qrCode: '',
       parcelNumber: '',
-      order: {},
       items: {},
       dialogError: false,
       errors: [],
+      nbArticle: 0
     }
   },
   computed: mapState({
     dialogQrCode: state => state.dialogQrCode,
+    order: state => state.order,
     parcels() {
-      return this.$store.getters.getParcels.map(function(a) {
-        if(a !== null) {
-          return a.number;
-        }
-        return [];
-      });
+
+      return this.$store.getters.getParcels;
     }
   }),
   methods: {
+    isQuantityEnteredIsOK(item) {
+console.log(this.getQuantityEnteredForProduct(item));
+      return this.getQuantityEnteredForProduct(item) <= item.quantity;
+    },
     validerQrCode() {
       this.errors = [];
+
       if (this.qrCode === '') {
         this.errors.push('Le numéro Qr code est obligatoire.');
+      }
+
+      if (this.nbArticle === 0) {
+        this.errors.push('Au moins 1 article est obligatoire.');
+      }
+
+      if (this.parcelNumber === '') {
+        this.errors.push('Au moins 1 article est obligatoire.');
       }
 
       // An parcel number is mandatory
@@ -123,19 +143,33 @@ export default {
         let present = false;
         // Check if the qrCode is in order
         this.$store.state.order.items.forEach(item => {
-          if (item.qrCode !== undefined) {
+          item.quantityEntered = parseInt(this.nbArticle);
+          if (item.qrCode !== undefined && item.qrCode === this.qrCode) {
+            if (!this.isQuantityEnteredIsOK(item) || item.quantityEntered > item.quantity) {
+              this.errors.push('La quantité saisie est trop grande.');
+            }
+
             if (item.qrCode === this.qrCode) {
-              // we push it in itemsReady array state
-              item.parcelNumber = this.parcelNumber;
-              this.$store.dispatch('addItemsReady', item);
               present = true;
+              if (this.errors.length === 0) {
+                // Add the parcel number to the item
+                item.parcelNumber = this.parcelNumber;
+
+                item.order = this.$store.state.order.number;
+
+                // we push it in itemsReady array state
+                this.$store.dispatch('addItemsReady', {item: item});
+              }
             }
           }
         });
 
-        this.$store.commit('toggleDialogQrCode')
-        this.qrCode = ''
-        this.parcelNumber = ''
+        if (this.errors.length === 0) {
+          this.$store.commit('toggleDialogQrCode')
+          this.qrCode = ''
+          this.parcelNumber = ''
+          this.nbArticle = 0
+        }
 
         // if the qrCode is not present in the orders, we show a dialog
         if (!present) {
@@ -144,6 +178,11 @@ export default {
       }
     },
     closeQrCode() {
+      // reset
+      this.qrCode = ''
+      this.parcelNumber = ''
+      this.nbArticle = 0
+      this.errors = [];
       this.$store.commit('toggleDialogQrCode')
     }
   }

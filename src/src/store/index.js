@@ -15,7 +15,7 @@ const getDefaultState = () => {
         itemsReady: [],
         parcels: [],
         count: 0,
-        itemsParcel: []
+        itemsParcel: [],
     }
 }
 
@@ -25,40 +25,56 @@ export default new Vuex.Store({
     },
     getters: {
         getParcels: state => {
-            if (state.parcels[state.order.number] !== undefined) {
-                return state.parcels[state.order.number];
-            }
-
-            return [];
+            let parcels = [];
+            state.itemsParcel.forEach((obj) => {
+                if (obj[1].orderNumber === state.order.number) {
+                    parcels.push(obj[0]);
+                }
+            });
+            return parcels;
         },
-        getItemsParcel: state => {
-            let count = [];
-            let countItemsParcels = [];
-
-            if (state.itemsParcel[state.order.number] !== undefined) {
-                state.parcels[state.order.number].forEach(function (parcel) {
-                    count[parcel.number] = 0;
-                    let countWeight = 0;
-                    Object.values(state.itemsReady[state.order.number]).forEach(item => {
-                        if (item.parcelNumber === parcel.number) {
-                            count[parcel.number] = count[parcel.number]+1;
-                            countWeight += item.weight
-                        }
+        getItemsParcels: state => {
+            let parcels = [];
+            state.itemsParcel.forEach((obj) => {
+                if (obj[1].order === state.order.number) {
+                    let quantityEntered = 0;
+                    let totalWeight = 0;
+                    obj[1].items.forEach(item => {
+                        quantityEntered += item.quantityEntered;
+                        totalWeight += item.weight * item.quantityEntered;
                     });
+                    parcels.push([obj[0], quantityEntered, totalWeight]);
+                }
+            });
 
-                    countItemsParcels.push([parcel.number, count[parcel.number], countWeight]);
-                });
-            }
-
-            return countItemsParcels;
-        }
+            return parcels;
+        },
     },
     plugins: [createPersistedState()],
     state: getDefaultState(),
     mutations: {
+        deleteParcel(state, parcel){
+            let deleted = false;
+            console.log(state.itemsParcel);
+            state.itemsParcel.forEach((obj) => {
+                if(obj[0] === parcel[0]) {
+                    if(obj[1].items.length === 0) {
+                        state.itemsParcel.splice(obj, 1);
+                        deleted = true;
+                    }
+                }
+            });
+
+            return deleted;
+        },
         addOrderParcel(state, parcelNum) {
-            state.parcels[state.order.number].push({number: parcelNum})
-            Vue.set(state.parcels, state.order.number, state.parcels[state.order.number])
+            state.itemsParcel.push([parcelNum, {
+                parcelNumber: parcelNum,
+                orderNumber: this.state.order.number,
+                order: state.order.number,
+                items: []
+            }]);
+            console.log(state.itemsParcel);
         },
         setOrders(state) {
             fetchData('orders').then((response) => {
@@ -73,33 +89,16 @@ export default new Vuex.Store({
         },
         setOrder(state, order) {
             state.order = order;
-            // we create an array to keep the items ready
-            if (state.itemsReady[order.number] === undefined) {
-                state.itemsReady[order.number] = [];
-            }
-            // we create an array to keep parcel number
-            if (state.parcels[order.number] === undefined) {
-                state.parcels[order.number] = [];
-            }
-
-            // we create an array to item in from parcels
-            if (state.itemsParcel[order.number] === undefined) {
-                state.itemsParcel[order.number] = [];
-            }
         },
-        pushItemsReady(state, item) {
-            state.itemsReady[state.order.number].push(item)
-            Vue.set(state.itemsReady, state.order.number, state.itemsReady[state.order.number])
-
-            state.parcels[state.order.number].forEach(function (parcel) {
-                console.log(parcel, item.parcelNumber);
-
-                Object.values(state.itemsReady[state.order.number]).forEach(item => {
-                    if (item.parcelNumber === parcel.number) {
-                        state.itemsParcel[state.order.number].splice(0, 0, [item.parcelNumber, item]);
-                    }
-                });
+        pushItemsReady(state, payload) {
+            state.itemsParcel.forEach((itemParcel) => {
+                if (itemParcel[0] === payload.item.parcelNumber &&
+                    itemParcel[1].order === state.order.number) {
+                    itemParcel[1]['items'].push(payload.item)
+                }
             });
+
+            console.log(state.itemsParcel);
         },
         resetState(state) {
             Object.assign(state, getDefaultState())
@@ -112,8 +111,8 @@ export default new Vuex.Store({
         fetchOrders(context) {
             context.commit('setOrders');
         },
-        addItemsReady(context, item) {
-            context.commit('pushItemsReady', item);
+        addItemsReady(context, payload) {
+            context.commit('pushItemsReady', payload);
         }
     }
 })

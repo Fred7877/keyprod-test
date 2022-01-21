@@ -22,6 +22,8 @@ const actions = {
                 }
             }
         })
+
+        throw 'denied';
     },
     async logOut({commit}) {
         let user = null
