@@ -18,6 +18,7 @@
               Poids
             </th>
           </tr>
+          <tr></tr>
           </thead>
           <tbody>
           <tr
@@ -25,30 +26,65 @@
               :key="i"
           >
             <td>{{ parcel[0] }}</td>
-            <td>{{ parcel[1]}}</td>
-            <td>{{ parcel[2]}}&nbsp;Kg</td>
+            <td>{{ parcel[1] }}</td>
+            <td>{{ parcel[2] }}&nbsp;Kg</td>
+            <td>
+              <v-icon
+                  small
+                  @click="deleteParcel(parcel)"
+              >
+                mdi-delete
+              </v-icon>
+            </td>
           </tr>
           </tbody>
         </template>
       </v-simple-table>
     </v-card>
-  </div>
 
+    <div class="text-center ma-2">
+      <v-snackbar
+          :value="snackbar"
+          absolute
+          top
+          right
+          tile
+          color="red accent-2"
+      >
+        Il y a des articles dans ce colis, impossible de le supprimer
+      </v-snackbar>
+    </div>
+
+
+  </div>
 </template>
 
 <script>
 
 export default {
   name: 'parcels-list',
+  data() {
+    return {
+      snackbar: false,
+      timeoutSnackbar: 2000,
+    }
+  },
   computed: {
     ItemsParcel() {
-console.log(this.$store.getters.getItemsParcel);
-      return this.$store.getters.getItemsParcel;
-    },
-    getParcels() {
 
-      return this.$store.getters.getParcels;
+      return this.$store.getters.getItemsParcels;
     },
+  },
+  methods: {
+    deleteParcel(parcel) {
+      if (!this.$store.commit('deleteParcel', parcel)) {
+        this.snackbar = true;
+        // This is for keep the control of the snackbar
+        setTimeout(() => {
+          this.snackbar = false;
+        }, this.timeoutSnackbar)
+      }
+    }
   }
 }
 </script>

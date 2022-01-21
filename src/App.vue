@@ -18,6 +18,7 @@
 
       </v-app-bar>
       <v-container fluid>
+
         <router-view/>
         <SideMenu v-if="showSideMenu"></SideMenu>
       </v-container>

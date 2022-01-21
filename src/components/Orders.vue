@@ -6,13 +6,17 @@
       class="elevation-1"
   >
 
-    <template v-slot:item.nb_article="{ item }">
+    <template v-slot:item.nb_reference="{ item }">
       {{ item.items !== undefined ? item.items.length : 0 }}
+    </template>
+
+    <template v-slot:item.nb_article="{ item }">
+      {{ countItems(item) }}
     </template>
 
     <template v-slot:item.status="{ item }">
       <v-chip
-          :color="getColorStatus(statusWording(item), item.number)"
+          :color="getColorStatusOrder(statusWording(item), item.number)"
           outlined
       >
         {{ statusWording(item) }}
@@ -47,8 +51,6 @@
         </template>
       </v-progress-linear>
     </template>
-
-
   </v-data-table>
 </template>
 
@@ -74,6 +76,12 @@ export default {
           align: 'start',
           sortable: true,
           value: 'name',
+        },
+        {
+          text: 'Nombre de références',
+          align: 'center',
+          sortable: true,
+          value: 'nb_reference',
         },
         {
           text: 'Nombre d\'articles',
@@ -121,14 +129,32 @@ export default {
     })
   },
   methods: {
+    countItems(item) {
+      let count = 0;
+      if (item.items !== undefined) {
+        item.items.forEach(item => {
+          count += item.quantity;
+        });
+      }
+
+      return count;
+    },
     progress(item) {
-      if (item.items === undefined ||
-          this.$store.state.itemsReady[item.number] === undefined ||
-          this.$store.state.itemsReady[item.number] === null) {
+
+      if (item.items === undefined) {
         return 0;
       }
 
-      return this.$store.state.itemsReady[item.number].length * 100 / item.items.length;
+      let totalItems = 0;
+      this.$store.state.itemsParcel.forEach(obj => {
+        obj[1].items.forEach((itemParcel) => {
+          if (itemParcel.order === item.number) {
+            totalItems += itemParcel.quantityEntered
+          }
+        });
+      });
+
+      return totalItems * 100 / this.countItems(item);
     },
     editItem(item) {
 
@@ -136,7 +162,7 @@ export default {
     },
     statusWording(order) {
 
-      return this.realStatus(order.items, order.number);
+      return this.realStatus(order.items, order);
     }
   }
 };

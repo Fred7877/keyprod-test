@@ -3,6 +3,7 @@
       class="d-flex justify-center mb-6"
       flat
       shaped
+      align="center"
   >
     <v-card
         class="pa-15"
@@ -32,15 +33,15 @@
         ></v-text-field>
 
         <v-btn
-            class="mr-4"
+            color="primary"
             @click="submit"
         >
           login
         </v-btn>
+
       </v-form>
     </v-card>
   </v-card>
-
 </template>
 
 <script>
@@ -53,7 +54,7 @@ export default {
       showError: false,
       userNameRules: [
         v => !!v || 'User name is required',
-        v => (v && v.length > 10) || 'Name must be more than 10 characters',
+        v => (v && v.length > 1) || 'Name must be more than 10 characters',
       ],
       passwordRules: [
         v => !!v || 'Password is required',
@@ -69,6 +70,7 @@ export default {
   methods: {
     ...mapActions(["LogIn"]),
     async submit() {
+
       const User = new FormData();
       User.append("username", this.form.username);
       User.append("password", this.form.password);

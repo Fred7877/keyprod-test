@@ -13,7 +13,7 @@
 <script>
 export default {
   name: 'NavBar',
-  computed : {
+  computed: {
     isLoggedIn : function(){ return this.$store.getters.isAuthenticated}
   },
   methods: {

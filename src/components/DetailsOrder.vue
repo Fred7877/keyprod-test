@@ -38,6 +38,7 @@
             class="mr-5"
             color="primary"
             @click="createParcelNumber"
+            :disabled="status === 'Traité'"
         >Nouveau numéro colis
         </v-btn>
 
@@ -45,15 +46,15 @@
             elevation="2"
             color="primary"
             @click="showDialogQrCode"
-            :disabled="!isParcelCreated"
-        >Saisir QR Code
+            :disabled="!isParcelCreated || status === 'Traité'"
+        >Scanner un QR Code
         </v-btn>
       </div>
 
     </div>
 
     <v-chip
-        :color="getColorStatus(status)"
+        :color="getColorStatusOrder(status)"
         class="mb-4"
         outlined
     >
@@ -74,17 +75,31 @@
           {{ item.weight }} Kg
         </template>
 
+        <template v-slot:item.totalWeightItems="{ item }">
+          {{ totalWeightItems(item) }} Kg
+        </template>
+
+        <template v-slot:item.quantity="{ item }">
+          {{ getQuantityEntered(item) }} / {{ item.quantity }}
+        </template>
+
         <template v-slot:item.ready="{ item }">
           <v-chip
-              :color="isReady(item)"
+              :color="getColorStatus(item)"
               dark
           >
             {{ statusWording(item) }}
           </v-chip>
         </template>
 
-        <template v-slot:item.parcelNumber="{ item }">
-          {{ getParcelNumber(item) }}
+        <template v-slot:item.parcelsNumber="{ item }">
+          <ul style="list-style: none; padding: 0">
+            <li
+                v-for="(parcelsNumber, i) in getParcelsNumber(item)"
+                :key="i"
+            > {{ parcelsNumber }}
+            </li>
+          </ul>
         </template>
 
       </v-data-table>
@@ -116,17 +131,23 @@ export default {
       order: state => state.order,
       itemsReady: (state) => state.itemsReady,
       isParcelCreated: function () {
+        let isParcelCreated = false;
 
-        return this.$store.state.parcels[this.order.number] !== null &&
-            this.$store.state.parcels[this.order.number] !== undefined &&
-            this.$store.state.parcels[this.order.number].length > 0;
+        if (this.$store.state.itemsParcel !== undefined &&
+            this.$store.state.itemsParcel.length > 0) {
+
+          this.$store.state.itemsParcel.forEach((obj) => {
+            if (obj[1].order === this.order.number) {
+              isParcelCreated = true;
+            }
+          });
+        }
+
+        return isParcelCreated;
       },
       status: function () {
 
-        return this.realStatus(this.items, this.order.number);
-      },
-      parcels() {
-        return this.$store.state.getParcels;
+        return this.realStatus(this.items, this.order);
       }
     }),
   },
@@ -136,7 +157,7 @@ export default {
         let totalWeight = 0;
         if (this.items !== undefined) {
           this.items.forEach((item) => {
-            totalWeight += item.weight;
+            totalWeight += item.weight * item.quantity;
           })
         }
 
@@ -150,10 +171,22 @@ export default {
           value: 'name',
         },
         {
-          text: 'Poids',
+          text: 'Poids / unité',
           align: 'start',
           sortable: true,
           value: 'weight',
+        },
+        {
+          text: 'Poids total',
+          align: 'start',
+          sortable: true,
+          value: 'totalWeightItems',
+        },
+        {
+          text: 'Nombre d\'articles',
+          align: 'center',
+          sortable: true,
+          value: 'quantity',
         },
         {
           text: 'Préparé',
@@ -165,7 +198,7 @@ export default {
           text: 'N° Colis',
           align: 'start',
           sortable: true,
-          value: 'parcelNumber',
+          value: 'parcelsNumber',
         }
       ],
       items: []
@@ -178,47 +211,62 @@ export default {
     });
   },
   methods: {
-    createParcelNumber() {
-      this.$store.dispatch('setOrderParcel', this.generateParcelNumber())
+    getQuantityEntered(item) {
+      let quantityEntered = 0;
+
+      this.$store.state.itemsParcel.forEach((obj) => {
+        obj[1].items.forEach((itemParcel) => {
+          if (itemParcel.qrCode === item.qrCode &&
+              this.$store.state.order.number === item.order) {
+            quantityEntered += itemParcel.quantityEntered
+          }
+        });
+      });
+
+      return quantityEntered;
     },
-    // get the item by the qrCode
-    filterItem(item) {
-      if (this.itemsReady[this.order.number] === null) {
-        return [];
+    totalWeightItems(item) {
+      let totalWeightItems = 0;
+
+      if (item.weight !== undefined) {
+        totalWeightItems = item.weight * item.quantity;
       }
 
-      return Object.values(this.itemsReady[this.order.number]).filter(obj => {
-        return obj.qrCode === item.qrCode
-      });
+      return totalWeightItems;
+    },
+    createParcelNumber() {
+      this.$store.dispatch('setOrderParcel', this.generateParcelNumber())
     },
     showDialogQrCode() {
       this.$store.commit('toggleDialogQrCode')
     },
-    getParcelNumber(item) {
-      let result = this.filterItem(item);
+    getParcelsNumber(item) {
 
-      if (result[0] !== undefined) {
-        return result[0].parcelNumber;
+      var parcelsNumber = [];
+      if (this.$store.state.itemsParcel !== undefined) {
+        this.$store.state.itemsParcel.forEach((obj) => {
+          obj[1].items.forEach((parcelItem) => {
+            if (parcelItem.qrCode === item.qrCode &&
+                this.$store.state.order.number === parcelItem.order) {
+              parcelsNumber.push(obj[0]);
+            }
+          });
+        });
       }
+
+      return parcelsNumber;
     },
-    isReady(item) {
-      let result = this.filterItem(item);
+    isStatusOk(item) {
 
-      if (result[0] !== undefined) {
-        return 'green';
-      } else {
-        return 'red';
-      }
+      return item.quantity === this.getQuantityEnteredForProduct(item);
+    },
+    getColorStatus(item) {
+
+      return this.isStatusOk(item) ? 'green' : 'red';
     },
     statusWording(item) {
 
-      let result = this.filterItem(item);
-
-      if (result[0] !== undefined) {
-        return 'OK';
-      } else {
-        return 'N-OK';
-      }
+      return this.isStatusOk(item) ? 'OK' : 'N-OK';
     }
   }
 };

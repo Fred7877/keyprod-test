@@ -8,27 +8,32 @@
       {
         "name": "Product 1",
         "qrCode": "KeyNetic_V1_LDKGIT",
-        "weight": 2
+        "weight": 2,
+        "quantity": 2
       },
       {
         "name": "Product 2",
         "qrCode": "KeyVibe_V2_WMDPAM",
-        "weight": 1
+        "weight": 1,
+        "quantity": 4
       },
       {
         "name": "Product 3",
         "qrCode": "KeyNetic_V1_BQPMMA",
-        "weight": 3.5
+        "weight": 3.5,
+        "quantity": 5
       },
       {
         "name": "Product 4",
         "qrCode": "KeyNetic_V3_AMAMAQ",
-        "weight": 0.4
+        "weight": 0.4,
+        "quantity": 1
       },
       {
         "name": "Product 5",
         "qrCode": "KeyNetic_V1_CCMQPA",
-        "weight": 0.9
+        "weight": 0.9,
+        "quantity": 35
       }
     ]
   },
@@ -41,17 +46,20 @@
       {
         "name": "Product 1",
         "qrCode": "KeyNetic_V1_LDKGIT",
-        "weight": 2
+        "weight": 2,
+        "quantity": 15
       },
       {
         "name": "Product 2",
         "qrCode": "KeyVibe_V2_WMDPAM",
-        "weight": 1
+        "weight": 1,
+        "quantity": 5
       },
       {
         "name": "Product 3",
         "qrCode": "KeyNetic_V1_BQPMMA",
-        "weight": 3.5
+        "weight": 3.5,
+        "quantity": 2
       }
     ]
   },
@@ -64,12 +72,14 @@
       {
         "name": "Product 1",
         "qrCode": "KeyNetic_V1_LDKGIT",
-        "weight": 2
+        "weight": 2,
+        "quantity": 3
       },
       {
         "name":  "Product 2",
         "qrCode": "KeyVibe_V2_WMDPAM",
-        "weight": 1
+        "weight": 1,
+        "quantity": 10
       }
     ]
   },
@@ -82,22 +92,26 @@
       {
         "name": "Product 1",
         "qrCode": "KeyNetic_V1_LDKGIT",
-        "weight": 1
+        "weight": 1,
+        "quantity": 8
       },
       {
         "name":"Product 2",
         "qrCode": "KeyVibe_V2_WMDPAM",
-        "weight": 1
+        "weight": 1,
+        "quantity": 22
       },
       {
         "name":"Product 3",
         "qrCode": "KeyNetic_V1_BQPMMA",
-        "weight": 3.5
+        "weight": 3.5,
+        "quantity": 4
       },
       {
         "name":"Product 4",
         "qrCode": "KeyNetic_V3_AMAMAQ",
-        "weight": 0.4
+        "weight": 0.4,
+        "quantity": 45
       }
     ]
   },
@@ -110,7 +124,8 @@
       {
         "name": "Product 1",
         "qrCode": "KeyNetic_V1_LDKGIT",
-        "weight": 1
+        "weight": 1,
+        "quantity": 6
       }
     ]
   },
