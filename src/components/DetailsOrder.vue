@@ -217,7 +217,7 @@ export default {
       this.$store.state.itemsParcel.forEach((obj) => {
         obj[1].items.forEach((itemParcel) => {
           if (itemParcel.qrCode === item.qrCode &&
-              this.$store.state.order.number === item.order) {
+              this.$store.state.order.number === itemParcel.order) {
             quantityEntered += itemParcel.quantityEntered
           }
         });
@@ -247,7 +247,7 @@ export default {
         this.$store.state.itemsParcel.forEach((obj) => {
           obj[1].items.forEach((parcelItem) => {
             if (parcelItem.qrCode === item.qrCode &&
-                this.$store.state.order.number === parcelItem.order) {
+                this.$store.state.order.number === parcelItem.order && !parcelsNumber.includes(obj[0])) {
               parcelsNumber.push(obj[0]);
             }
           });

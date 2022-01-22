@@ -53,7 +53,7 @@
           <v-btn
               color="primary"
               text
-              @click="validerQrCode"
+              @click="qrCodeValidation"
           >
             Valider
           </v-btn>
@@ -120,22 +120,22 @@ export default {
   }),
   methods: {
     isQuantityEnteredIsOK(item) {
-console.log(this.getQuantityEnteredForProduct(item));
-      return this.getQuantityEnteredForProduct(item) <= item.quantity;
+
+      return this.getQuantityEnteredForProduct(item) < item.quantity;
     },
-    validerQrCode() {
+    qrCodeValidation() {
       this.errors = [];
 
       if (this.qrCode === '') {
         this.errors.push('Le numéro Qr code est obligatoire.');
       }
 
-      if (this.nbArticle === 0) {
+      if (this.nbArticle == 0) {
         this.errors.push('Au moins 1 article est obligatoire.');
       }
 
       if (this.parcelNumber === '') {
-        this.errors.push('Au moins 1 article est obligatoire.');
+        this.errors.push('Un numéro de colis est obligatoire.');
       }
 
       // An parcel number is mandatory
@@ -158,7 +158,7 @@ console.log(this.getQuantityEnteredForProduct(item));
                 item.order = this.$store.state.order.number;
 
                 // we push it in itemsReady array state
-                this.$store.dispatch('addItemsReady', {item: item});
+                this.$store.commit('pushItemsReady', {item: item});
               }
             }
           }

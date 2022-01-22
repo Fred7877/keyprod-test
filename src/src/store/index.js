@@ -16,6 +16,7 @@ const getDefaultState = () => {
         parcels: [],
         count: 0,
         itemsParcel: [],
+        isParcelRemoved: false
     }
 }
 
@@ -53,19 +54,18 @@ export default new Vuex.Store({
     plugins: [createPersistedState()],
     state: getDefaultState(),
     mutations: {
-        deleteParcel(state, parcel){
-            let deleted = false;
-            console.log(state.itemsParcel);
-            state.itemsParcel.forEach((obj) => {
-                if(obj[0] === parcel[0]) {
-                    if(obj[1].items.length === 0) {
-                        state.itemsParcel.splice(obj, 1);
-                        deleted = true;
+        resetIsRemovedParcel(state) {
+            state.isParcelRemoved = false;
+        },
+        deleteParcel(state, parcel) {
+            state.itemsParcel.forEach((obj, i) => {
+                if (obj[0] === parcel[0]) {
+                    if (obj[1].items.length === 0) {
+                        state.itemsParcel.splice(i, 1);
+                        state.isParcelRemoved = true
                     }
                 }
             });
-
-            return deleted;
         },
         addOrderParcel(state, parcelNum) {
             state.itemsParcel.push([parcelNum, {
@@ -74,7 +74,6 @@ export default new Vuex.Store({
                 order: state.order.number,
                 items: []
             }]);
-            console.log(state.itemsParcel);
         },
         setOrders(state) {
             fetchData('orders').then((response) => {
@@ -90,15 +89,26 @@ export default new Vuex.Store({
         setOrder(state, order) {
             state.order = order;
         },
-        pushItemsReady(state, payload) {
-            state.itemsParcel.forEach((itemParcel) => {
-                if (itemParcel[0] === payload.item.parcelNumber &&
-                    itemParcel[1].order === state.order.number) {
-                    itemParcel[1]['items'].push(payload.item)
+        pushItemsReady(state, payload) { // Add article into parcel
+            let index = null;
+
+            state.itemsParcel.forEach((itemParcel, i) => {
+                if (itemParcel[0] === payload.item.parcelNumber) {
+                    index = i;
+
+                    /* Aucune de ces méthodes ne fonctionne, il faut recharger la page manuellement pour que le nouvel item soit persister dans itemsParcel,
+                        sinon, le nouvel viendra écraser l'ancien...
+                     */
+
+                    /*itemParcel[1].items.unshift(payload.item);
+                    itemParcel[1].items.push(payload.item);*/
+                    //Object.assign(state.itemsParcel[i][1].items, payload.item);
+                    //Vue.set(itemParcel[1].items, itemParcel[1].items.length, payload.item);
                 }
             });
 
-            console.log(state.itemsParcel);
+            // Ne fonctionne pas vraiment non plus
+            Vue.set(state.itemsParcel[index][1].items, state.itemsParcel[index][1].items.length, payload.item);
         },
         resetState(state) {
             Object.assign(state, getDefaultState())
@@ -110,9 +120,6 @@ export default new Vuex.Store({
         },
         fetchOrders(context) {
             context.commit('setOrders');
-        },
-        addItemsReady(context, payload) {
-            context.commit('pushItemsReady', payload);
         }
     }
 })
