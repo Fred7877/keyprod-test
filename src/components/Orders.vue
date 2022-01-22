@@ -32,12 +32,6 @@
       >
         mdi-pencil
       </v-icon>
-      <v-icon
-          small
-          @click="deleteItem(item)"
-      >
-        mdi-delete
-      </v-icon>
     </template>
 
     <template v-slot:item.progress="{ item }">
@@ -114,7 +108,7 @@ export default {
         },
         {
           text: 'Actions',
-          align: 'start',
+          align: 'center',
           sortable: false,
           value: 'actions',
         },
