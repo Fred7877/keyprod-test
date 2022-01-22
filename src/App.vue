@@ -6,6 +6,13 @@
           v-if="showAppBar"
       >
         <v-app-bar-nav-icon @click="toggleMenu" v-show="!drawer"></v-app-bar-nav-icon>
+
+        <v-avatar
+            color="red white--text"
+            size="25"
+        >{{ getFirstLetterUser() }}</v-avatar>
+
+        {{ this.$store.getters.stateUser.substring(1) }}
         <v-spacer></v-spacer>
 
         <v-btn
@@ -53,6 +60,10 @@ export default {
     async logout() {
       await this.$store.dispatch('logOut')
     },
+    getFirstLetterUser() {
+
+      return this.$store.getters.stateUser[0].toUpperCase();
+    }
   }
 };
 </script>
