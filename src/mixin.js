@@ -51,10 +51,12 @@ export default {
         },
         getQuantityEnteredForProduct(product) {
             let quantitiesEntered = 0;
+
             if (this.$store.state.itemsParcel !== undefined) {
                 this.$store.state.itemsParcel.forEach((obj) => {
                     obj[1].items.forEach((item) => {
-                        if (product.qrCode === item.qrCode) {
+                        if (product.qrCode === item.qrCode &&
+                            this.$store.state.order.number === item.order) {
                             quantitiesEntered += item.quantityEntered;
                         }
                     });

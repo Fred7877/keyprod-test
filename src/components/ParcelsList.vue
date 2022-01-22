@@ -77,11 +77,14 @@ export default {
   },
   methods: {
     deleteParcel(parcel) {
-      if (!this.$store.commit('deleteParcel', parcel)) {
+      this.$store.commit('deleteParcel', parcel)
+
+      if (!this.$store.state.isParcelRemoved) {
         this.snackbar = true;
         // This is for keep the control of the snackbar
         setTimeout(() => {
           this.snackbar = false;
+          this.$store.commit('resetIsRemovedParcel')
         }, this.timeoutSnackbar)
       }
     }
