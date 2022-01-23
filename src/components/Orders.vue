@@ -156,7 +156,7 @@ export default {
     },
     statusWording(order) {
 
-      return this.realStatus(order.items, order);
+      return this.realStatus(order);
     }
   }
 };
