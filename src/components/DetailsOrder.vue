@@ -147,21 +147,14 @@ export default {
       },
       status: function () {
 
-        return this.realStatus(this.items, this.order);
+        return this.realStatus(this.order);
       }
     }),
   },
   data() {
     return {
       totalWeight: function () {
-        let totalWeight = 0;
-        if (this.items !== undefined) {
-          this.items.forEach((item) => {
-            totalWeight += item.weight * item.quantity;
-          })
-        }
-
-        return totalWeight.toFixed(2) + ' Kg';
+        return this.sumWeight(this.items)
       },
       headers: [
         {

@@ -1,5 +1,21 @@
 export default {
     methods: {
+        sumItem(items) {
+            let totalQuantityEntered = 0;
+            items.forEach((item) => {
+                totalQuantityEntered += item.quantityEntered;
+            })
+
+            return totalQuantityEntered;
+        },
+        sumWeight(items) {
+            let totalWeight = 0;
+            items.forEach((item) => {
+                totalWeight += item.weight * item.quantityEntered;
+            })
+
+            return totalWeight.toFixed(2) + ' Kg';
+        },
         generateParcelNumber() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let result = '';
@@ -66,8 +82,8 @@ export default {
 
             return quantitiesEntered;
         },
-        realStatus: function (items, order) {
-            if (items === undefined) {
+        realStatus: function (order) {
+            if (order.items === undefined) {
                 return 'Anomalie';
             }
 

@@ -41,6 +41,7 @@ export default new Vuex.Store({
                     let quantityEntered = 0;
                     let totalWeight = 0;
                     obj[1].items.forEach(item => {
+                        // Todo : ça serai bien d'utiliser les méthodes (sumItem, sumWeight) de la mixin ici...
                         quantityEntered += item.quantityEntered;
                         totalWeight += item.weight * item.quantityEntered;
                     });
@@ -96,8 +97,8 @@ export default new Vuex.Store({
                 if (itemParcel[0] === payload.item.parcelNumber) {
                     index = i;
 
-                    /* Aucune de ces méthodes ne fonctionne, il faut recharger la page manuellement pour que le nouvel item soit persister dans itemsParcel,
-                        sinon, le nouvel viendra écraser l'ancien...
+                    /* Aucune de ces méthodes ne fonctionne, il faut recharger la page manuellement pour que le nouvel item soit persisté dans itemsParcel,
+                        sinon, le nouvel item viendra écraser l'ancien...
                      */
 
                     /*itemParcel[1].items.unshift(payload.item);

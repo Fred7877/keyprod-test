@@ -4,6 +4,7 @@ import Orders from '../components/Orders.vue'
 import store from '../src/store'
 import Login from '../components/Login'
 import DetailsOrder from '../components/DetailsOrder'
+import TrackingParcel from "../components/TrackingParcel";
 
 Vue.use(VueRouter)
 
@@ -24,6 +25,12 @@ const routes = [
     path: '/details-order/:orderId',
     component: DetailsOrder,
     name: 'details-order',
+    meta: {requiresAuth: true},
+  },
+  {
+    path: '/tracking-parcel',
+    component: TrackingParcel,
+    name: 'tracking-parcel',
     meta: {requiresAuth: true},
   }
 ]

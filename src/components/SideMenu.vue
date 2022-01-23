@@ -33,7 +33,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              <router-link to="/orders">{{ item.title }}</router-link>
+              <router-link :to="item.route">{{ item.title }}</router-link>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -57,7 +57,8 @@ export default {
   data() {
     return {
       items: [
-        {title: 'Commandes', icon: 'mdi-view-dashboard'},
+        {title: 'Commandes', icon: 'mdi-view-dashboard', route: '/orders'},
+        {title: 'Suivi commande', icon: 'mdi-truck-delivery', route: '/tracking-parcel'},
       ],
     }
   },
