@@ -49,6 +49,19 @@
 
       </v-card>
     </v-form>
+
+    <div class="text-center ma-2">
+      <v-snackbar
+          :value="showNotFind"
+          absolute
+          top
+          right
+          tile
+          color="red accent-2"
+      >
+        Colis non trouvé
+      </v-snackbar>
+    </div>
   </div>
 </template>
 
@@ -60,7 +73,7 @@ import mixin from "../mixin";
 export default {
   name: 'tracking-parcel',
   mixins: [mixin],
-  data() {
+  data: () => {
     return {
       rules: [
         v => !!v || 'Le n° de colis est obligatoire',
@@ -74,13 +87,13 @@ export default {
       find: false,
       articleCount: 0,
       totalWeight: 0,
+      showNotFind: false
     }
   },
   methods: {
-    search() {
-      // QWSo0ceY3fRd
-      // E68rfMqgr9l1
-      // ZBNf96omME8e
+    async search() {
+      // Zz4jhnByvsTJ
+
       fetchData('orders').then((orders) => {
         // We want the order status, we loop in all order
         orders.forEach((order) => {
@@ -109,15 +122,13 @@ export default {
         });
       })
 
-
-      /*
-      this.$store.state.itemsParcel.forEach((parcel) => {
-        if (this.parcelNumber === parcel[0]) {
-          console.log(parcel);
-          this.parcel = parcel
-        }
-      });
-       */
+      // show error message when number parcel is not found
+      if(!this.find) {
+        this.showNotFind = true;
+        setTimeout(() => {
+          this.showNotFind = false;
+        }, 2000)
+      }
     }
   }
 }
