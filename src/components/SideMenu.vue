@@ -58,7 +58,7 @@ export default {
     return {
       items: [
         {title: 'Commandes', icon: 'mdi-view-dashboard', route: '/orders'},
-        {title: 'Suivi commande', icon: 'mdi-truck-delivery', route: '/tracking-parcel'},
+        {title: 'Suivi colis', icon: 'mdi-truck-delivery', route: '/tracking-parcel'},
       ],
     }
   },
