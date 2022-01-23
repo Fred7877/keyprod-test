@@ -30,6 +30,7 @@
             :type="showPassword ? 'text' : 'password'"
             label="Password"
             @click:append="showPassword = !showPassword"
+            v-on:keyup.enter="submit"
         ></v-text-field>
 
         <v-btn
